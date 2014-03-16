@@ -19,30 +19,30 @@ import com.jcraft.jsch
 import com.jcraft.jsch.JSch
 
 class Settings extends SActivity {
-  implicit val tag = new LoggerTag("UsbHost");
+	implicit val tag = new LoggerTag("UsbHost");
 
-  onCreate {
-    val prefs = Prefs()
-    contentView = new SVerticalLayout {
-      STextView("SSH Server:")
-      val server = SEditText(prefs.server) inputType TEXT_URI
+	onCreate {
+		val prefs = Prefs()
+		contentView = new SVerticalLayout {
+			STextView("SSH Server:")
+			val server = SEditText(prefs.server) inputType TEXT_URI
 
-      STextView("User:")
-      val user = SEditText(prefs.user) inputType TEXT_URI
+			STextView("User:")
+			val user = SEditText(prefs.user) inputType TEXT_URI
 
-      STextView("Password:")
-      val password = SEditText(prefs.password) inputType TEXT_URI
+			STextView("Password:")
+			val password = SEditText(prefs.password) inputType TEXT_URI
 
-      STextView("Listening port:")
-      val rport = SEditText(prefs.rport) inputType TEXT_URI
+			STextView("Listening port:")
+			val rport = SEditText(prefs.rport) inputType TEXT_URI
 
-      SButton("Enregistrer").onClick({
-        prefs.server = server.text.toString
-        prefs.user = user.text.toString
-        prefs.password = password.text.toString
-        prefs.rport = rport.text.toString
-        ()
-      })
-    } padding 20.dip
-  }
+			SButton("Enregistrer").onClick({
+				prefs.server = server.text.toString
+				prefs.user = user.text.toString
+				prefs.password = password.text.toString
+				prefs.rport = rport.text.toString
+				()
+			})
+		} padding 20.dip
+	}
 }
