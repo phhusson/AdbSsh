@@ -27,7 +27,7 @@
 			</intent-filter>
 		</activity>
 
-		<service android:name="AdbService">
-		</service>
+		<service android:name="AdbService" />
+		<service android:name="SshService" />
     </application>
 </manifest>

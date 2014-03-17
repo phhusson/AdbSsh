@@ -7,7 +7,6 @@ import android.content.{Intent,Context}
 import android.hardware.usb.{UsbManager,UsbDevice,UsbInterface,UsbDeviceConnection}
 import android.hardware.usb.{UsbEndpoint,UsbConstants}
 import com.cgutman.adblib._
-//import com.cgutman.adblib.AdbProtocol.AdbMessage
 import java.io.InputStream
 import java.io.File
 import java.nio.{ByteBuffer,ByteOrder}
@@ -21,14 +20,15 @@ import com.jcraft.jsch.JSch
 class Main extends SActivity {
 	implicit val tag = new LoggerTag("UsbHost");
 	@inline def usbManager(implicit context: Context): UsbManager = context.getSystemService(Context.USB_SERVICE).asInstanceOf[UsbManager]
-	val service = new LocalServiceConnection[AdbService];
+	val adbService = new LocalServiceConnection[AdbService];
+	val sshService = new LocalServiceConnection[SshService];
 
 	def main(adbDevice: UsbDevice, adbInterface: UsbInterface, session: jsch.Session) = {
 		warn("Hello !")
-		service({ adb: AdbService =>
+		adbService({ adb: AdbService =>
 			adb.connect(adbDevice, adbInterface);
 		})
-		service.onConnected += { adb: AdbService =>
+		adbService.onConnected += { adb: AdbService =>
 			adb.connect(adbDevice, adbInterface);
 		}
 	}
@@ -99,6 +99,7 @@ class Main extends SActivity {
 			}
 		}
 
+		/*
 		spawn {
 			try {
 				warn("Hell for JSch thread");
@@ -129,22 +130,27 @@ class Main extends SActivity {
 				});
 				channel.connect();
 				warn("Channel connected")
-				session.setPortForwardingR("*", prefs.rport.toInt, classOf[AdbDaemon].getName(), Array(service).asInstanceOf[Array[Object]]);
+				session.setPortForwardingR("*", prefs.rport.toInt, classOf[AdbDaemon].getName(), Array(adbService).asInstanceOf[Array[Object]]);
 				warn("Setted port forwarding !")
 			} catch {
 				case e: Exception => warn("Got an exception ! " + e);
 			}
-		}
+		}*/
 
 		if(adbDevice != null) {
 			warn("Requesting usb permission");
 		if(usbManager.hasPermission(adbDevice)) {
-				warn("Already has permission !");
+			warn("Already has permission !");
 			spawn {
 				main(adbDevice, adbInterface, session);
 			}
 		} else
 			usbManager.requestPermission(adbDevice, mPermissionIntent);
 		}
+
+		sshService({ s =>
+			s.connect(prefs.server, prefs.user, prefs.password);
+			s.forwardPort(prefs.rport.toInt, classOf[AdbDaemon].getName(), Array(adbService).asInstanceOf[Array[Object]]);
+		});
 	}
 }
