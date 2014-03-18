@@ -20,6 +20,7 @@ import com.jcraft.jsch.JSch
 
 class Settings extends SActivity {
 	implicit val tag = new LoggerTag("UsbHost");
+	val sshService = new LocalServiceConnection[SshService];
 
 	onCreate {
 		val prefs = Prefs()
@@ -41,6 +42,16 @@ class Settings extends SActivity {
 				prefs.user = user.text.toString
 				prefs.password = password.text.toString
 				prefs.rport = rport.text.toString
+				()
+			})
+
+			SButton("Local Shell").onClick({
+				spawn {
+					sshService({ s =>
+						s.connect(prefs.server, prefs.user, prefs.password);
+						s.forwardPort(prefs.rport.toInt, classOf[ShellDaemon].getName(), null);
+					});
+				}
 				()
 			})
 		} padding 20.dip
