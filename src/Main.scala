@@ -99,44 +99,6 @@ class Main extends SActivity {
 			}
 		}
 
-		/*
-		spawn {
-			try {
-				warn("Hell for JSch thread");
-				val ssh = new JSch();
-				JSch.setLogger(new jsch.Logger() {
-					def isEnabled(level: Int): Boolean = { true }
-					def log(level: Int, msg: String) = {
-						warn("JSCH: " + msg);
-					}
-				})
-				val session = ssh.getSession(prefs.user, prefs.server, 22);
-				warn("Got session");
-				session.setPassword(prefs.password);
-				warn("Set passwd");
-				session.setConfig("StrictHostKeyChecking", "no");
-				warn("Strict host key")
-				session.connect(30000);
-				warn("Connected");
-
-				val channel = session.openChannel("shell");
-				warn("Opened channel")
-				channel.setInputStream(null);
-				warn("Set IS")
-				channel.setOutputStream(new java.io.OutputStream {
-					override def write(b: Int): Unit = {
-						warn("SSH: " + b.toChar);
-					}
-				});
-				channel.connect();
-				warn("Channel connected")
-				session.setPortForwardingR("*", prefs.rport.toInt, classOf[AdbDaemon].getName(), Array(adbService).asInstanceOf[Array[Object]]);
-				warn("Setted port forwarding !")
-			} catch {
-				case e: Exception => warn("Got an exception ! " + e);
-			}
-		}*/
-
 		if(adbDevice != null) {
 			warn("Requesting usb permission");
 		if(usbManager.hasPermission(adbDevice)) {

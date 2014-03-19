@@ -18,6 +18,8 @@ import scala.collection.mutable.SynchronizedQueue
 import com.jcraft.jsch
 import com.jcraft.jsch.JSch
 
+import com.google.ase.Exec
+
 class Settings extends SActivity {
 	implicit val tag = new LoggerTag("UsbHost");
 	val sshService = new LocalServiceConnection[SshService];
@@ -46,10 +48,13 @@ class Settings extends SActivity {
 			})
 
 			SButton("Local Shell").onClick({
+				var exec = new Exec(assets.open("jni/libcom_google_ase_Exec.so"), new File(cacheDir, "libcom_google_ase_Exec.so"))
+				var args = new Array[Object](1);
+				args(0) = exec
 				spawn {
 					sshService({ s =>
 						s.connect(prefs.server, prefs.user, prefs.password);
-						s.forwardPort(prefs.rport.toInt, classOf[ShellDaemon].getName(), null);
+						s.forwardPort(prefs.rport.toInt, classOf[ShellDaemon].getName(), args);
 					});
 				}
 				()
