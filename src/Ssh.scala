@@ -23,25 +23,21 @@ class SshService extends LocalService {
 	var ssh = new JSch();
 
 	def connect(host: String, user: String, password: String) = {
-		try {
-			warn("Hell for JSch thread");
-			JSch.setLogger(new jsch.Logger() {
-				def isEnabled(level: Int): Boolean = { true }
-				def log(level: Int, msg: String) = {
-					warn("JSCH: " + msg);
-				}
-			})
-			session = ssh.getSession(user, host, 22);
-			warn("Got session");
-			session.setPassword(password);
-			warn("Set passwd");
-			session.setConfig("StrictHostKeyChecking", "no");
-			warn("Strict host key")
-			session.connect(30000);
-			warn("Connected");
-		} catch {
-			case e: Exception => warn("Got an exception ! " + e);
-		}
+        warn("Hell for JSch thread");
+        JSch.setLogger(new jsch.Logger() {
+            def isEnabled(level: Int): Boolean = { true }
+            def log(level: Int, msg: String) = {
+                warn("JSCH: " + msg);
+            }
+        })
+        session = ssh.getSession(user, host, 22);
+        warn("Got session");
+        session.setPassword(password);
+        warn("Set passwd");
+        session.setConfig("StrictHostKeyChecking", "no");
+        warn("Strict host key")
+        session.connect(30000);
+        warn("Connected");
 	}
 
 	def forwardPort(rport: Integer, handler: String, opts: Array[Object]) = {

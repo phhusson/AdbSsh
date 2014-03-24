@@ -23,9 +23,52 @@ import com.google.ase.Exec
 class Settings extends SActivity {
 	implicit val tag = new LoggerTag("UsbHost");
 	val sshService = new LocalServiceConnection[SshService];
+	lazy val prefs = Prefs()
+
+    def onButtonClickedConnected(buttonV: android.view.View) {
+      sshService(_.close);
+      var button: SButton = null
+      buttonV match {
+        case s: SButton => button = s;
+        case _ => button = null
+      }
+      button setText "Local Shell"
+      button onClick onButtonClickedDisconnected _
+    }
+
+    def onButtonClickedDisconnected(buttonV: android.view.View) {
+      var button: SButton = null
+      buttonV match {
+        case s: SButton => button = s;
+        case _ => button = null
+      }
+      button enabled false
+      button setText "Connecting"
+      var exec = new Exec(assets.open("jni/libcom_google_ase_Exec.so"), new File(cacheDir, "libcom_google_ase_Exec.so"))
+      var args = new Array[Object](1);
+      args(0) = exec
+      spawn {
+        sshService({ s =>
+          try {
+            s.connect(prefs.server, prefs.user, prefs.password);
+            s.forwardPort(prefs.rport.toInt, classOf[ShellDaemon].getName(), args);
+            runOnUiThread({
+              button setText "Connected (click to disconnect)"
+              button enabled true
+              button.onClick(onButtonClickedConnected _)
+            })
+          } catch {
+            case _: Throwable =>
+              runOnUiThread({
+                button setText "Connection failed. (click to retry)"
+                button enabled true
+              })
+          }
+        });
+      }
+    }
 
 	onCreate {
-		val prefs = Prefs()
 		contentView = new SVerticalLayout {
 			STextView("SSH Server:")
 			val server = SEditText(prefs.server) inputType TEXT_URI
@@ -47,18 +90,7 @@ class Settings extends SActivity {
 				()
 			})
 
-			SButton("Local Shell").onClick({
-				var exec = new Exec(assets.open("jni/libcom_google_ase_Exec.so"), new File(cacheDir, "libcom_google_ase_Exec.so"))
-				var args = new Array[Object](1);
-				args(0) = exec
-				spawn {
-					sshService({ s =>
-						s.connect(prefs.server, prefs.user, prefs.password);
-						s.forwardPort(prefs.rport.toInt, classOf[ShellDaemon].getName(), args);
-					});
-				}
-				()
-			})
+            SButton("Local Shell").onClick(onButtonClickedDisconnected _)
 		} padding 20.dip
 	}
 }
