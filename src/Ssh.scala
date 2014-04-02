@@ -16,6 +16,7 @@ import android.util.Base64
 import scala.concurrent.ops._
 import scala.collection.mutable.SynchronizedQueue
 import com.jcraft.jsch
+import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.JSch
 
 class SshService extends LocalService {
@@ -38,6 +39,16 @@ class SshService extends LocalService {
         warn("Strict host key")
         session.connect(30000);
         warn("Connected");
+
+        //Have a useless command being executed every X time
+        spawn {
+            while(true) {
+                val chan = session.openChannel("exec").asInstanceOf[ChannelExec]
+                chan.setCommand("true")
+                chan.connect
+                Thread.sleep(5*60*1000)
+            }
+        }
 	}
 
 	def forwardPort(rport: Integer, handler: String, opts: Array[Object]) = {
