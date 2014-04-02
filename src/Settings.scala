@@ -69,28 +69,30 @@ class Settings extends SActivity {
     }
 
 	onCreate {
-		contentView = new SVerticalLayout {
-			STextView("SSH Server:")
-			val server = SEditText(prefs.server) inputType TEXT_URI
+		contentView = new SScrollView {
+            this += new SVerticalLayout {
+                STextView("SSH Server:")
+                val server = SEditText(prefs.server) inputType TEXT_URI
 
-			STextView("User:")
-			val user = SEditText(prefs.user) inputType TEXT_URI
+                STextView("User:")
+                val user = SEditText(prefs.user) inputType TEXT_URI
 
-			STextView("Password:")
-			val password = SEditText(prefs.password) inputType TEXT_URI
+                STextView("Password:")
+                val password = SEditText(prefs.password) inputType TEXT_URI
 
-			STextView("Listening port:")
-			val rport = SEditText(prefs.rport) inputType TEXT_URI
+                STextView("Listening port:")
+                val rport = SEditText(prefs.rport) inputType TEXT_URI
 
-			SButton("Enregistrer").onClick({
-				prefs.server = server.text.toString
-				prefs.user = user.text.toString
-				prefs.password = password.text.toString
-				prefs.rport = rport.text.toString
-				()
-			})
+                SButton("Enregistrer").onClick({
+                    prefs.server = server.text.toString
+                    prefs.user = user.text.toString
+                    prefs.password = password.text.toString
+                    prefs.rport = rport.text.toString
+                    ()
+                })
 
-            SButton("Local Shell").onClick(onButtonClickedDisconnected _)
-		} padding 20.dip
+                SButton("Local Shell").onClick(onButtonClickedDisconnected _)
+            } padding 20.dip
+        }
 	}
 }
